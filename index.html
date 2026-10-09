@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Foto 3x4: monte fotos 3x4 para imprimir em papel 10x15</title>
+  <meta name="description" content="Enquadre sua foto em 3x4 ou 5x7 com guias para o rosto, monte a folha 10x15 ou A4 com linhas de corte e baixe um JPEG em 300 dpi. Tudo no navegador.">
+  <meta name="theme-color" content="#0e7490">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./print-10x15.css" media="print" id="page-10x15">
+  <link rel="stylesheet" href="./print-a4.css" media="print" id="page-a4">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <div class="screen">
+    <header class="site-header">
+      <h1>Foto 3x4</h1>
+      <p class="lead">Enquadre a foto, monte a folha 10x15 (ou A4) com linhas de corte e imprima em casa ou na loja de revelação.</p>
+    </header>
+
+    <main>
+      <p class="local-note">
+        <strong>Sua foto não sai do seu aparelho.</strong>
+        O recorte, a montagem e o arquivo final são feitos aqui no navegador. Esta página nem tem permissão para enviar dados pela rede.
+      </p>
+
+      <section class="card" id="open-card" aria-labelledby="open-title">
+        <h2 id="open-title">1. Escolha a foto</h2>
+        <div class="dropzone" id="dropzone">
+          <p class="dropzone-title">Arraste uma foto para cá ou cole com <kbd>Ctrl</kbd> + <kbd>V</kbd></p>
+          <div class="actions center">
+            <input type="file" id="file-input" class="visually-hidden" accept="image/*">
+            <label for="file-input" class="btn">Escolher foto</label>
+            <button type="button" class="btn secondary" id="sample">Testar com um exemplo</button>
+          </div>
+          <p class="muted small">JPEG, PNG ou WebP. No celular, o botão também abre a câmera.</p>
+        </div>
+        <p id="open-status" class="status" role="status" aria-live="polite"></p>
+        <details class="tips">
+          <summary>Dicas para uma boa foto 3x4</summary>
+          <ul>
+            <li>Fundo claro e liso (parede branca ou cinza bem clara), sem objetos atrás.</li>
+            <li>Luz de frente e uniforme, sem sombra forte no rosto nem no fundo. Luz de janela funciona bem.</li>
+            <li>Rosto de frente, olhando para a câmera, com expressão neutra e olhos abertos.</li>
+            <li>Sem óculos escuros, boné, chapéu ou cabelo cobrindo os olhos.</li>
+            <li>Peça para outra pessoa tirar a foto a um ou dois metros, com a câmera na altura dos olhos. Selfie de perto distorce o rosto.</li>
+          </ul>
+        </details>
+      </section>
+
+      <section class="card" id="crop-card" aria-labelledby="crop-title" hidden>
+        <h2 id="crop-title">2. Enquadre o rosto</h2>
+        <div class="crop-layout">
+          <div class="crop-stage" id="crop-stage">
+            <canvas id="crop-canvas" tabindex="0" role="img" aria-label="Enquadramento da foto. Arraste para mover, use as setas e as teclas + e - para ajustar."></canvas>
+          </div>
+          <div class="crop-controls">
+            <label class="slider">
+              <span>Zoom <output id="zoom-label">100%</output></span>
+              <input type="range" id="zoom" min="100" max="800" step="1" value="100">
+            </label>
+            <label class="slider">
+              <span>Endireitar <output id="angle-label">0°</output></span>
+              <input type="range" id="angle" min="-45" max="45" step="0.5" value="0">
+            </label>
+            <div class="actions">
+              <button type="button" class="btn ghost" id="rotate-left">Girar 90° para a esquerda</button>
+              <button type="button" class="btn ghost" id="rotate-right">Girar 90° para a direita</button>
+              <button type="button" class="btn ghost" id="reset-crop">Recomeçar</button>
+            </div>
+            <label class="check"><input type="checkbox" id="show-guides" checked> Mostrar guias do rosto</label>
+            <p class="muted small">
+              Arraste a foto para posicionar. Deixe o rosto dentro do oval, com os olhos perto da linha.
+              Roda do mouse ou pinça com dois dedos dá zoom. Com o foco na foto: setas movem,
+              <kbd>+</kbd> e <kbd>-</kbd> dão zoom, <kbd>[</kbd> e <kbd>]</kbd> endireitam.
+            </p>
+            <p id="photo-info" class="muted small" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="sheet-card" aria-labelledby="sheet-title" hidden>
+        <h2 id="sheet-title">3. Monte a folha</h2>
+        <div class="sheet-layout">
+          <div class="sheet-form">
+            <fieldset class="choice">
+              <legend>Tamanho da foto</legend>
+              <div class="segmented">
+                <label><input type="radio" name="photo" value="3x4" checked> <span>3 x 4 cm</span></label>
+                <label><input type="radio" name="photo" value="5x7"> <span>5 x 7 cm</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="choice">
+              <legend>Papel</legend>
+              <div class="segmented">
+                <label><input type="radio" name="paper" value="10x15" checked> <span>10 x 15 cm</span></label>
+                <label><input type="radio" name="paper" value="a4"> <span>Folha A4</span></label>
+              </div>
+            </fieldset>
+            <div class="fields">
+              <label class="field">
+                <span>Espaço entre fotos (mm)</span>
+                <input type="number" id="gap" min="0" max="10" step="0.5" value="2" inputmode="decimal">
+              </label>
+              <label class="field">
+                <span>Margem mínima (mm)</span>
+                <input type="number" id="margin" min="0" max="20" step="0.5" value="2" inputmode="decimal">
+              </label>
+              <label class="field">
+                <span>Quantidade</span>
+                <select id="count"></select>
+              </label>
+            </div>
+            <label class="check"><input type="checkbox" id="cut-lines" checked> Linhas de corte</label>
+            <p id="sheet-summary" class="summary" aria-live="polite"></p>
+            <p id="sheet-hint" class="hint-box" hidden>
+              <span id="sheet-hint-text"></span>
+              <button type="button" class="btn small secondary" id="apply-hint">Usar</button>
+            </p>
+          </div>
+          <figure class="sheet-preview">
+            <canvas id="sheet-canvas" role="img" aria-label="Prévia da folha montada"></canvas>
+            <figcaption class="muted small" id="sheet-caption">Prévia da folha</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="card" id="export-card" aria-labelledby="export-title" hidden>
+        <h2 id="export-title">4. Baixe ou imprima</h2>
+        <div class="actions">
+          <button type="button" class="btn" id="download-sheet">Baixar folha (JPEG 300 dpi)</button>
+          <button type="button" class="btn secondary" id="print">Imprimir</button>
+          <button type="button" class="btn ghost" id="download-photo">Baixar só uma foto</button>
+        </div>
+        <p id="export-status" class="status" role="status" aria-live="polite"></p>
+        <div class="print-notes">
+          <div>
+            <h3>Na loja de revelação ou no quiosque</h3>
+            <p>Leve o arquivo da folha e peça <strong>impressão 10x15 sem ajuste</strong> (sem "preencher" nem cortar). O arquivo já tem 1181 x 1772 pixels marcados como 300 dpi, o tamanho exato do papel.</p>
+          </div>
+          <div>
+            <h3>Na impressora de casa</h3>
+            <p>Use <strong>Imprimir</strong>, escolha o papel certo, <strong>escala 100% (tamanho real)</strong> e margens "nenhuma". Imprima uma vez em papel comum e confira com uma régua: a foto 3x4 deve medir 3 cm por 4 cm.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card explain" aria-labelledby="rules-title">
+        <h2 id="rules-title">Antes de imprimir</h2>
+        <ul>
+          <li>Cada órgão, escola ou empresa tem suas regras (fundo, expressão, acessórios, validade da foto). Confira o que pedem antes de imprimir.</li>
+          <li>A foto 3x4 é a mais pedida em carteira de identidade, carteira de trabalho, matrícula escolar, crachá e cadastros em geral.</li>
+          <li>O 5x7 é o formato tradicional de passaporte. Para o passaporte brasileiro, a foto costuma ser tirada no próprio atendimento da Polícia Federal.</li>
+          <li>Papel fotográfico brilhante ou fosco dá o melhor resultado. Papel comum serve para conferir o tamanho.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Tudo roda no seu navegador. Código aberto no <a href="https://github.com/micdog22/foto-3x4">GitHub</a> · Licença MIT</p>
+    </footer>
+  </div>
+
+  <div class="print-root" id="print-root" aria-hidden="true"></div>
+</body>
+</html>

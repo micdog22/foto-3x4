@@ -1,0 +1,11 @@
+{
+  "name": "foto-3x4",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enquadre fotos 3x4 ou 5x7 com guias para o rosto e monte folhas 10x15 ou A4 com linhas de corte e JPEG em 300 dpi, no navegador.",
+  "type": "module",
+  "scripts": { "test": "node --test" },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/micdog22/foto-3x4.git" },
+  "homepage": "https://micdog22.github.io/foto-3x4/"
+}

@@ -1,0 +1,2 @@
+/* Tamanho da página na impressão em papel 10x15 (ativado pelo app antes de imprimir). */
+@page { size: 100mm 150mm; margin: 0; }
